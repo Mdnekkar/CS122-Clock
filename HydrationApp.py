@@ -1,3 +1,4 @@
+import random
 import tkinter as tk
 from tkinter import messagebox
 
@@ -12,6 +13,7 @@ class HydrationApp:
         self.dailyIntake = 64  # oz
         self.currentIntake = 0
         self.reminderInterval = 60*60*1000 #default is 1hr in milliseconds
+        self.afterID = None
 
         # Init screens
         self.mainFrame = None
@@ -32,7 +34,7 @@ class HydrationApp:
         self.show_frame(self.mainFrame)
 
         #starting reminder function
-        #self.set_reminder()
+        self.set_reminder()
 
 
     def show_frame(self, frame):
@@ -61,12 +63,35 @@ class HydrationApp:
         tk.Button(self.mainFrame, text="Set Custom Water Intake",
                   command=lambda: self.show_frame(self.intakeFrame),
                   width=20
-                  ).pack(pady=(200,0))
+                  ).pack(pady=(150,0))
 
         tk.Button(self.mainFrame, text="Change Reminder Interval",
                   command=lambda: self.show_frame(self.reminderFrame),
                   width=20
                   ).pack()
+
+        tk.Button(self.mainFrame,
+                  text="Lifestyle / Activity Settings",
+                  command=lambda: self.show_frame(None),
+                  width=20
+                  ).pack()
+
+        tk.Button(self.mainFrame,
+                  text="Humidity Stuff",
+                  command=lambda: self.show_frame(None),
+                  width=20
+                  ).pack()
+
+        self.currentIntakeEntry = (tk.Entry(self.mainFrame, width=20))
+        self.currentIntakeEntry.pack(pady=(100,1))
+
+        tk.Button(self.mainFrame,
+                  text="Add to Water Log",
+                  command=self.set_currentIntake,
+                  width=20
+                  ).pack()
+
+
 
     def create_intakeFrame(self):
         self.intakeFrame = tk.Frame(self.root, bg="#ADD8E6")
@@ -113,9 +138,9 @@ class HydrationApp:
                   ).pack()
 
         tk.Button(self.reminderFrame,
-                  text="Every 10 seconds (demo)",
+                  text="Every 5 seconds (demo)",
                   width=15,
-                  command=lambda: self.updateReminderInterval(10)
+                  command=lambda: self.updateReminderInterval(5)
                   ).pack()
 
         self.intervalLabel = (tk.Label(self.reminderFrame, text=f"Interval is set to: {self.reminderInterval}.",
@@ -138,19 +163,48 @@ class HydrationApp:
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
 
+
+    def set_currentIntake(self):
+        try:
+            amount = int(self.currentIntakeEntry.get())
+            self.currentIntake += amount
+            self.currentIntakeEntry.delete(0, tk.END)
+            self.updateCurrentIntakeLabel()
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid number.")
+
+    def updateCurrentIntakeLabel(self): # to update current intake label
+        self.currentIntakelabel.config(text=f"Current Intake: {self.currentIntake} oz")
+
     def updateDailyIntakeLabel(self): #to update daily intake suggestion label
         self.goalLabel.config(text=f"Daily Water Intake Goal: {self.dailyIntake} oz")
 
     def updateReminderInterval(self, interval):
         self.reminderInterval = int(interval * 1000) #converted to milliseconds
-        self.intervalLabel.config(text=f"Interval has changed to: {self.reminderInterval}.")
-        print("Reminder Interval is", self.reminderInterval)
+        if self.afterID is not None:
+            self.root.after_cancel(self.afterID)
+            self.afterID = None
+            self.afterID = self.root.after(self.reminderInterval, self.set_reminder)
+            self.intervalLabel.config(text=f"Interval has changed to: {self.reminderInterval}.")
+            print("Reminder Interval is", self.reminderInterval)
 
     def set_reminder(self):
-        reminder = "Time to drink water"
-        messagebox.showinfo("Reminder", reminder)
+        self.afterID = self.root.after(self.reminderInterval, self.sendReminder)
+
+    def sendReminder(self):
+        reminder = ["Time to drink water and you know it",
+                    "Sipping water like a pro",
+                    "Stay hydrated, stay healthy",
+                    "Hydration leads to healthy skin glow",
+                    "Water is the best way to quench your thirst",
+                    "Hydrate, Refresh, Repeat",
+                    "Keep it cool, stay hydrated",
+                    "Hydration is key",
+                    "Drink Water, feel better"]
+
         print('reminder sent')
-        self.root.after(self.reminderInterval, self.set_reminder)
+        messagebox.showinfo("Reminder", reminder[random.randint(0, len(reminder)-1)])
+        self.set_reminder()
 
 if __name__ == "__main__":
     root = tk.Tk()
