@@ -19,6 +19,8 @@ class HydrationApp:
         self.mainFrame = None
         self.intakeFrame = None
         self.reminderFrame = None
+        self.lifestyleFrame = None
+        self.humidityFrame = None
 
         #init label
         self.goalLabel = None
@@ -29,6 +31,8 @@ class HydrationApp:
         self.create_mainFrame()
         self.create_intakeFrame()
         self.create_reminderFrame()
+        self.create_lifestyleFrame()
+        self.create_humidityFrame()
 
 
         self.show_frame(self.mainFrame)
@@ -72,13 +76,13 @@ class HydrationApp:
 
         tk.Button(self.mainFrame,
                   text="Lifestyle / Activity Settings",
-                  command=lambda: self.show_frame(None),
+                  command=lambda: self.show_frame(self.lifestyleFrame),
                   width=20
                   ).pack()
 
         tk.Button(self.mainFrame,
                   text="Humidity Stuff",
-                  command=lambda: self.show_frame(None),
+                  command=lambda: self.show_frame(self.humidityFrame),
                   width=20
                   ).pack()
 
@@ -152,6 +156,27 @@ class HydrationApp:
                   width=15
                   ).pack()
 
+    def create_lifestyleFrame(self):
+        self.lifestyleFrame = tk.Frame(self.root, bg="#ADD8E6")
+        tk.Label(self.lifestyleFrame, text="Lifestyle frame").pack(pady=(50, 250))
+
+        tk.Button(self.lifestyleFrame,
+                  text="Return to main menu",
+                  command=lambda: self.show_frame(self.mainFrame),
+                  width=20
+                  ).pack()
+
+    def create_humidityFrame(self):
+        self.humidityFrame = tk.Frame(self.root, bg="#ADD8E6")
+        tk.Label(self.humidityFrame, text="humidity frame").pack(pady=(50, 250))
+
+        tk.Button(self.humidityFrame,
+                  text="Return to main menu",
+                  command=lambda: self.show_frame(self.mainFrame),
+                  width=20
+                  ).pack()
+
+#updating stuff
 
     def set_customIntake(self):
         try:
@@ -173,12 +198,16 @@ class HydrationApp:
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
 
+
+#updating labels
     def updateCurrentIntakeLabel(self): # to update current intake label
         self.currentIntakelabel.config(text=f"Current Intake: {self.currentIntake} oz")
 
     def updateDailyIntakeLabel(self): #to update daily intake suggestion label
         self.goalLabel.config(text=f"Daily Water Intake Goal: {self.dailyIntake} oz")
 
+
+# reminder stuff
     def updateReminderInterval(self, interval):
         self.reminderInterval = int(interval * 1000) #converted to milliseconds
         if self.afterID is not None:
