@@ -2,6 +2,7 @@ import random
 import requests
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 
 
 class HydrationApp:
@@ -66,11 +67,31 @@ class HydrationApp:
         self.currentIntakelabel = tk.Label(self.mainFrame, text=f"Current Intake: {self.currentIntake} oz")
         self.currentIntakelabel.pack(pady=(1,10))
 
+        #progress bar for water intake
+        style = ttk.Style()
+        style.theme_use("clam")  # Use a modern theme
+        style.configure(
+            "Blue.Vertical.TProgressbar",
+            troughcolor="white",
+            background="#1E90FF",  # DeepSkyBlue for the filled part
+            thickness=20
+        )
+
+        # Progress bar for water intake
+        self.progressBar = ttk.Progressbar(
+            self.mainFrame,
+            orient="vertical",
+            length=200,
+            mode="determinate",
+            style="Blue.Vertical.TProgressbar"
+        )
+        self.progressBar.pack(pady=(10, 0))
+
         #buttons
         tk.Button(self.mainFrame, text="Set Custom Water Intake",
                   command=lambda: self.show_frame(self.intakeFrame),
                   width=20
-                  ).pack(pady=(150,0))
+                  ).pack(pady=(20,0))
 
         tk.Button(self.mainFrame, text="Change Reminder Interval",
                   command=lambda: self.show_frame(self.reminderFrame),
@@ -90,7 +111,7 @@ class HydrationApp:
                   ).pack()
 
         self.currentIntakeEntry = (tk.Entry(self.mainFrame, width=20))
-        self.currentIntakeEntry.pack(pady=(100,1))
+        self.currentIntakeEntry.pack(pady=(60,1))
         tk.Button(self.mainFrame,
                   text="Add to Water Log",
                   command=self.set_currentIntake,
@@ -198,6 +219,7 @@ class HydrationApp:
             self.dailyIntake = amount
             self.customIntakeEntry.delete(0, tk.END)
             self.updateDailyIntakeLabel()
+            self.updateProgressBar()
             self.show_frame(self.mainFrame)
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
@@ -209,8 +231,13 @@ class HydrationApp:
             self.currentIntake += amount
             self.currentIntakeEntry.delete(0, tk.END)
             self.updateCurrentIntakeLabel()
+            self.updateProgressBar()
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
+
+    def updateProgressBar(self):
+        progress = min((self.currentIntake / self.dailyIntake) * 100, 100)
+        self.progressBar['value'] = progress
 
 
 #updating labels
