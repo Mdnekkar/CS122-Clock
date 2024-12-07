@@ -156,7 +156,7 @@ class HydrationApp:
                   width=15
                   ).pack()
 
-    def create_lifestyleFrame(self):
+    def create_lifestyleFrame(self): #to do
         self.lifestyleFrame = tk.Frame(self.root, bg="#ADD8E6")
         tk.Label(self.lifestyleFrame, text="Lifestyle frame").pack(pady=(50, 250))
 
@@ -166,7 +166,7 @@ class HydrationApp:
                   width=20
                   ).pack()
 
-    def create_humidityFrame(self):
+    def create_humidityFrame(self): #to do
         self.humidityFrame = tk.Frame(self.root, bg="#ADD8E6")
         tk.Label(self.humidityFrame, text="humidity frame").pack(pady=(50, 250))
 
