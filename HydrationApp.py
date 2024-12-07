@@ -1,4 +1,5 @@
 import random
+import requests
 import tkinter as tk
 from tkinter import messagebox
 
@@ -7,7 +8,7 @@ class HydrationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Hydration App")
-        self.root.geometry("400x600")
+        self.root.geometry("450x650")
 
         # Water variables
         self.dailyIntake = 64  # oz
@@ -42,10 +43,12 @@ class HydrationApp:
 
 
     def show_frame(self, frame):
-        if frame == self.mainFrame: #disable when returning to main
+        if frame == self.mainFrame: #allow use of button on main screen
             self.customIntakeEntry.unbind("<Return>")
+            self.currentIntakeEntry.bind("<Return>", lambda event: self.set_currentIntake())
 
         if frame == self.intakeFrame: #allow use of return button on intake frame
+            self.currentIntakeEntry.unbind("<Return>")
             self.customIntakeEntry.bind("<Return>", lambda event: self.set_customIntake())
 
         for w in self.root.winfo_children():
@@ -88,7 +91,6 @@ class HydrationApp:
 
         self.currentIntakeEntry = (tk.Entry(self.mainFrame, width=20))
         self.currentIntakeEntry.pack(pady=(100,1))
-
         tk.Button(self.mainFrame,
                   text="Add to Water Log",
                   command=self.set_currentIntake,
@@ -105,8 +107,6 @@ class HydrationApp:
 
         self.customIntakeEntry = tk.Entry(self.intakeFrame)
         self.customIntakeEntry.pack(pady=(0,5))
-
-        self.customIntakeEntry.bind("<Return>", lambda event: self.set_customIntake()) #allows use of enter button
         tk.Button(self.intakeFrame,
                   text="Set custom intake",
                   command=self.set_customIntake,
@@ -158,13 +158,27 @@ class HydrationApp:
 
     def create_lifestyleFrame(self): #to do
         self.lifestyleFrame = tk.Frame(self.root, bg="#ADD8E6")
-        tk.Label(self.lifestyleFrame, text="Lifestyle frame").pack(pady=(50, 250))
+        tk.Label(self.lifestyleFrame, text="Lifestyle settings", width=10).pack(pady=(50, 30))
+        tk.Button(self.lifestyleFrame, text="Sedentary", width=10).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Light", width=10).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Moderate", width=10).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="High", width=10).pack(pady=(0, 50))
+
+
+
+        tk.Label(self.lifestyleFrame, text="Physical Activity", width=10).pack(pady=(50, 10))
+        tk.Button(self.lifestyleFrame, text="Cardio", width=10).pack(pady=(0,0))
+        tk.Button(self.lifestyleFrame, text="Sports", width=10).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Weight Lifting", width=10).pack(pady=(0, 100))
+        tk.Button()
+
 
         tk.Button(self.lifestyleFrame,
                   text="Return to main menu",
                   command=lambda: self.show_frame(self.mainFrame),
-                  width=20
+                  width=15
                   ).pack()
+
 
     def create_humidityFrame(self): #to do
         self.humidityFrame = tk.Frame(self.root, bg="#ADD8E6")
@@ -228,7 +242,7 @@ class HydrationApp:
                     "Water is the best way to quench your thirst",
                     "Hydrate, Refresh, Repeat",
                     "Keep it cool, stay hydrated",
-                    "Hydration is key",
+                    "Hydration is key to better health",
                     "Drink Water, feel better"]
 
         print('reminder sent')
