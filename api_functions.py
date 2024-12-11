@@ -1,35 +1,56 @@
-# import requests
-# import json
+import requests
+import json
+import os
 
-# def get_coordinates(city, state, country):
-#     if country.lower() == "us" or country.lower() == "united states":
-#         api_url = 'https://api.api-ninjas.com/v1/geocoding?city=' + city + '&state=' + state + 'country=' + country
-#     else: 
-#         api_url = 'https://api.api-ninjas.com/v1/geocoding?city=' + city + 'country=' + country
+def verify_location_and_get_coordinates(city, country, state=" "):
+    different_usa = ["us", "united states", "usa", "united states of america"]
+    if country.lower() in different_usa:
+        api_url = f'https://api.api-ninjas.com/v1/geocoding?city={city}&state={state}&country={country}'
+    else: 
+        api_url = f'https://api.api-ninjas.com/v1/geocoding?city={city}&country={country}'
     
-#     response = requests.get(api_url + city, headers={'X-Api-Key': '6NwQY7rx9RkELLWbuzlktQ==C0X9Dtj2twZRhg9W'})
-    
-#     if response.status_code == requests.codes.ok:
-#         locations = json.loads(response.text)
+    try: 
+        response = requests.get(api_url, headers={'X-Api-Key': "6NwQY7rx9RkELLWbuzlktQ==C0X9Dtj2twZRhg9W"})
         
-#         # Get the first location from the location list
-#         first_location = locations[0]
+        if response.status_code == requests.codes.ok:
+            locations = json.loads(response.text)
+            
+            if locations: 
+                # Get the first location from the location list
+                first_location = locations[0]
 
-#         # Extract the details of the first location
-#         name = first_location['name']
-#         latitude = first_location['latitude']
-#         longitude = first_location['longitude']
-#         country1 = first_location['country']
-#         state1 = first_location['state']
+                # Extract the details of the first location
+                latitude = first_location['latitude']
+                longitude = first_location['longitude']
 
-#         return latitude, longitude
-#     else:
-#         return ("Error:", response.status_code, response.text)
+                return latitude, longitude
+            else: 
+                return 0
+        else:
+            return 0
+    except requests.exceptions.RequestException as e:
+        return 0
+        
+
+def convert_coordinates_to_humidity(lat, lon):
+
+    import requests
+
+    url = "https://api.tomorrow.io/v4/weather/realtime?location=toronto&apikey=qkmebBv8ketyz5R6Iomew2Cb07rGJTMu"
+
+    headers = {"accept": "application/json"}
+
+    response = requests.get(url, headers=headers)
+
+    weather_data = json.loads(response.text)
+
+    humidity = weather_data['data']['values']['humidity']
+    celcius_temp = weather_data['data']['values']['temperature']
+
+    farenheit_temp = (celcius_temp*9/5) + 32
+
+    return (humidity, farenheit_temp)
     
-# coordinates = get_coordinates(city="Campbell", state="California", country="us")
-# latidude = coordinates[0]
-# longitude = coordinates[1]
+print(convert_coordinates_to_humidity(33.44, -94.04))
 
-# # def convert_coordinates_to_humidity(lat, lon):
-# #     api_url = 'https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&exclude={part}&appid={"796666b6a274950bf900b688681b895d"}'
-# #     current_weather = 
+    

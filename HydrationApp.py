@@ -96,24 +96,24 @@ class HydrationApp:
         #buttons
         tk.Button(self.mainFrame, text="Set Custom Water Intake",
                   command=lambda: self.show_frame(self.intakeFrame),
-                  width=20
+                  width=30
                   ).pack(pady=(20,0))
 
         tk.Button(self.mainFrame, text="Change Reminder Interval",
                   command=lambda: self.show_frame(self.reminderFrame),
-                  width=20
+                  width=30
                   ).pack()
 
         tk.Button(self.mainFrame,
-                  text="Update Daily Activity and Workouts",
+                  text="Update Lifestyle and Workout",
                   command=lambda: self.show_frame(self.lifestyleFrame),
-                  width=20
+                  width=30
                   ).pack()
 
         tk.Button(self.mainFrame,
                   text="Update Location",
                   command=lambda: self.show_frame(self.humidityFrame),
-                  width=20
+                  width=30
                   ).pack()
 
         self.currentIntakeEntry = (tk.Entry(self.mainFrame, width=20))
@@ -122,7 +122,7 @@ class HydrationApp:
         tk.Button(self.mainFrame,
                   text="Add to Water Log",
                   command=self.set_currentIntake,
-                  width=20
+                  width=30
                   ).pack()
 
 
@@ -185,21 +185,6 @@ class HydrationApp:
                   ).pack()
         
     
-    # Updating user's activity levels 
-    def set_lifestyle(self, level):
-        activity_levels = {"Sedentary": 0, "Light": 8, "Moderate": 12, "High": 24}
-        self.lifestyle_affect = activity_levels.get(level, 0)
-        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
-        self.updateDailyIntakeLabel()
-        messagebox.showinfo("Lifestyle Set", f"Your lifestyle is set to {level}. Daily intake updated!")
-
-    # Updating the physcial activity in settings
-    def set_physical_activity(self, level):
-        activity_levels = {"Light": 8, "Moderate": 12, "Intense": 16}
-        self.activity_affect = activity_levels.get(level, 0)
-        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
-        self.updateDailyIntakeLabel()
-        messagebox.showinfo("Workout Activity Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
     # Lifestyle Frame
     def create_lifestyleFrame(self):
@@ -211,7 +196,7 @@ class HydrationApp:
         tk.Button(self.lifestyleFrame, text="High (e.g. physical labor)", width=30, command=lambda: self.set_lifestyle("High")).pack(pady=(0, 50))
 
 
-        tk.Label(self.lifestyleFrame, text="Workout Intensity", width=40).pack(pady=(50, 10))
+        tk.Label(self.lifestyleFrame, text="Workout Intensity", width=40).pack(pady=(50, 30))
         tk.Button(self.lifestyleFrame, text="Light (casual or leisure activities)", width=30, command=lambda: self.set_physical_activity("Light")).pack(pady=(0,0))
         tk.Button(self.lifestyleFrame, text="Moderate (can hold a conversation)", width=30, command=lambda: self.set_physical_activity("Moderate")).pack(pady=(0, 0))
         tk.Button(self.lifestyleFrame, text="Intense (difficulty conversing)", width=30, command=lambda: self.set_physical_activity("Intense")).pack(pady=(0, 100))
@@ -222,10 +207,6 @@ class HydrationApp:
                   width=15
                   ).pack()
 
-
-    # function for the humidity frame
-    def update_humidity(self):
-        x =10 # placeholder -- will be deleted
     
     # Humidity Frame
     def create_humidityFrame(self): #to do
@@ -236,24 +217,24 @@ class HydrationApp:
         city_label = tk.Label(self.humidityFrame, text="Enter your current city:")
         city_label.pack(pady=5)  # Space between the label and text box
 
-        city_entry = tk.Entry(self.humidityFrame)
-        city_entry.pack(pady=5)  # Space between the text box and next widget
+        self.city_entry = tk.Entry(self.humidityFrame)
+        self.city_entry.pack(pady=5)  # Space between the text box and next widget
 
         # Label and entry for State
         state_label = tk.Label(self.humidityFrame, text="Enter your current state (if applicable):")
         state_label.pack(pady=5)
 
-        state_entry = tk.Entry(self.humidityFrame)
-        state_entry.pack(pady=5)
+        self.state_entry = tk.Entry(self.humidityFrame)
+        self.state_entry.pack(pady=5)
 
         # Label and entry for Country
         country_label = tk.Label(self.humidityFrame, text="Enter your current country:")
         country_label.pack(pady=5)
 
-        country_entry = tk.Entry(self.humidityFrame)
-        country_entry.pack(pady=5)
+        self.country_entry = tk.Entry(self.humidityFrame)
+        self.country_entry.pack(pady=5)
 
-        submit_button = tk.Button(self.humidityFrame, text="Submit")
+        submit_button = tk.Button(self.humidityFrame, text="Submit", command=self.get_location_data)
         submit_button.pack(pady=10)
                 
         tk.Button(self.humidityFrame,
@@ -264,7 +245,7 @@ class HydrationApp:
         
 
 
-#updating stuff
+# Updating stuff
     def set_customIntake(self):
         try:
             amount = int(self.customIntakeEntry.get())
@@ -290,6 +271,60 @@ class HydrationApp:
     def updateProgressBar(self):
         progress = min((self.currentIntake / self.dailyIntake) * 100, 100)
         self.progressBar['value'] = progress
+    
+    # Updating user's activity levels 
+    def set_lifestyle(self, level):
+        activity_levels = {"Sedentary": 0, "Light": 8, "Moderate": 12, "High": 24}
+        self.lifestyle_affect = activity_levels.get(level, 0)
+        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.updateDailyIntakeLabel()
+        messagebox.showinfo("Lifestyle Set", f"Your lifestyle is set to {level}. Daily intake updated!")
+
+    # Updating the physcial activity in settings
+    def set_physical_activity(self, level):
+        activity_levels = {"Light": 8, "Moderate": 12, "Intense": 16}
+        self.activity_affect = activity_levels.get(level, 0)
+        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.updateDailyIntakeLabel()
+        messagebox.showinfo("Workout Activity Set", f"Your lifestyle is set to {level}. Daily intake updated!")
+
+
+    def get_location_data(self):
+        try:
+            the_city = self.city_entry.get().strip()
+            the_state = self.state_entry.get().strip()
+            the_country = self.country_entry.get().strip()
+
+            if not the_city or not the_country:
+                messagebox.showwarning("Error", "City and Country are required fields.")
+                return
+            
+            if not the_state: 
+                coordinates = api_functions.verify_location_and_get_coordinates(city=the_city, country=the_country)
+            else:
+                coordinates = api_functions.verify_location_and_get_coordinates(city=the_city, state=the_state, country=the_country)
+
+            if coordinates == 0: 
+                messagebox.showerror("Error", "Could not verify location. Please input a valid city and country.")
+                return
+            else:
+                latidude = coordinates[0]
+                longitude = coordinates[1]
+
+                weather_data = api_functions.convert_coordinates_to_humidity(lat=latidude, lon=longitude)
+
+                humidity = weather_data[0]
+                f_temp = weather_data[1]
+
+                if humidity < 30 or humidity > 60:
+                    self.humidity_affect = self.dailyIntake * 0.1
+                    self.dailyIntake = 64 + self.activity_affect + self.humidity_affect
+            messagebox.showinfo("Location Updated", "Your location has been taken into account.")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occured: {e}.")
+
+        
 
 
 #updating labels
