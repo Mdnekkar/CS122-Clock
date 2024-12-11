@@ -1,5 +1,5 @@
 import random
-import requests
+import api_functions
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -12,7 +12,12 @@ class HydrationApp:
         self.root.geometry("450x650")
 
         # Water variables
-        self.dailyIntake = 64  # oz
+        self.humidity_affect = 0 # default 0, can be changed later
+        self.lifestyle_affect = 0 # default 0, can be changed later
+        self.activity_affect = 0 # defaul 0, can be changed later
+        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect  # oz
+        
+
         self.currentIntake = 0
         self.reminderInterval = 60*60*1000 #default is 1hr in milliseconds
         self.afterID = None
@@ -41,6 +46,7 @@ class HydrationApp:
 
         #starting reminder function
         self.set_reminder()
+
 
 
     def show_frame(self, frame):
@@ -99,19 +105,20 @@ class HydrationApp:
                   ).pack()
 
         tk.Button(self.mainFrame,
-                  text="Lifestyle / Activity Settings",
+                  text="Update Daily Activity and Workouts",
                   command=lambda: self.show_frame(self.lifestyleFrame),
                   width=20
                   ).pack()
 
         tk.Button(self.mainFrame,
-                  text="Humidity Stuff",
+                  text="Update Location",
                   command=lambda: self.show_frame(self.humidityFrame),
                   width=20
                   ).pack()
 
         self.currentIntakeEntry = (tk.Entry(self.mainFrame, width=20))
         self.currentIntakeEntry.pack(pady=(60,1))
+        
         tk.Button(self.mainFrame,
                   text="Add to Water Log",
                   command=self.set_currentIntake,
@@ -176,23 +183,38 @@ class HydrationApp:
                   command=lambda: self.show_frame(self.mainFrame),
                   width=15
                   ).pack()
+        
+    
+    # Updating user's activity levels 
+    def set_lifestyle(self, level):
+        activity_levels = {"Sedentary": 0, "Light": 8, "Moderate": 12, "High": 24}
+        self.lifestyle_affect = activity_levels.get(level, 0)
+        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.updateDailyIntakeLabel()
+        messagebox.showinfo("Lifestyle Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
-    def create_lifestyleFrame(self): #to do
+    # Updating the physcial activity in settings
+    def set_physical_activity(self, level):
+        activity_levels = {"Light": 8, "Moderate": 12, "Intense": 16}
+        self.activity_affect = activity_levels.get(level, 0)
+        self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.updateDailyIntakeLabel()
+        messagebox.showinfo("Workout Activity Set", f"Your lifestyle is set to {level}. Daily intake updated!")
+
+    # Lifestyle Frame
+    def create_lifestyleFrame(self):
         self.lifestyleFrame = tk.Frame(self.root, bg="#ADD8E6")
-        tk.Label(self.lifestyleFrame, text="Lifestyle settings", width=10).pack(pady=(50, 30))
-        tk.Button(self.lifestyleFrame, text="Sedentary", width=10).pack(pady=(0, 0))
-        tk.Button(self.lifestyleFrame, text="Light", width=10).pack(pady=(0, 0))
-        tk.Button(self.lifestyleFrame, text="Moderate", width=10).pack(pady=(0, 0))
-        tk.Button(self.lifestyleFrame, text="High", width=10).pack(pady=(0, 50))
+        tk.Label(self.lifestyleFrame, text="Activity in Daily Life", width=40).pack(pady=(50, 30))
+        tk.Button(self.lifestyleFrame, text="Sedentary (e.g. desk job)", width=30, command=lambda: self.set_lifestyle("Sedentary")).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Light (e.g. only a bit of walking)", width=30, command=lambda: self.set_lifestyle("Light")).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Moderate (e.g. moving often)", width=30, command=lambda: self.set_lifestyle("Moderate")).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="High (e.g. physical labor)", width=30, command=lambda: self.set_lifestyle("High")).pack(pady=(0, 50))
 
 
-
-        tk.Label(self.lifestyleFrame, text="Physical Activity", width=10).pack(pady=(50, 10))
-        tk.Button(self.lifestyleFrame, text="Cardio", width=10).pack(pady=(0,0))
-        tk.Button(self.lifestyleFrame, text="Sports", width=10).pack(pady=(0, 0))
-        tk.Button(self.lifestyleFrame, text="Weight Lifting", width=10).pack(pady=(0, 100))
-        tk.Button()
-
+        tk.Label(self.lifestyleFrame, text="Workout Intensity", width=40).pack(pady=(50, 10))
+        tk.Button(self.lifestyleFrame, text="Light (casual or leisure activities)", width=30, command=lambda: self.set_physical_activity("Light")).pack(pady=(0,0))
+        tk.Button(self.lifestyleFrame, text="Moderate (can hold a conversation)", width=30, command=lambda: self.set_physical_activity("Moderate")).pack(pady=(0, 0))
+        tk.Button(self.lifestyleFrame, text="Intense (difficulty conversing)", width=30, command=lambda: self.set_physical_activity("Intense")).pack(pady=(0, 100))
 
         tk.Button(self.lifestyleFrame,
                   text="Return to main menu",
@@ -201,18 +223,48 @@ class HydrationApp:
                   ).pack()
 
 
+    # function for the humidity frame
+    def update_humidity(self):
+        x =10 # placeholder -- will be deleted
+    
+    # Humidity Frame
     def create_humidityFrame(self): #to do
         self.humidityFrame = tk.Frame(self.root, bg="#ADD8E6")
-        tk.Label(self.humidityFrame, text="humidity frame").pack(pady=(50, 250))
+        tk.Label(self.humidityFrame, text="Update Location", width=30).pack(pady=(50, 15))
 
+        # Label and entry for City
+        city_label = tk.Label(self.humidityFrame, text="Enter your current city:")
+        city_label.pack(pady=5)  # Space between the label and text box
+
+        city_entry = tk.Entry(self.humidityFrame)
+        city_entry.pack(pady=5)  # Space between the text box and next widget
+
+        # Label and entry for State
+        state_label = tk.Label(self.humidityFrame, text="Enter your current state (if applicable):")
+        state_label.pack(pady=5)
+
+        state_entry = tk.Entry(self.humidityFrame)
+        state_entry.pack(pady=5)
+
+        # Label and entry for Country
+        country_label = tk.Label(self.humidityFrame, text="Enter your current country:")
+        country_label.pack(pady=5)
+
+        country_entry = tk.Entry(self.humidityFrame)
+        country_entry.pack(pady=5)
+
+        submit_button = tk.Button(self.humidityFrame, text="Submit")
+        submit_button.pack(pady=10)
+                
         tk.Button(self.humidityFrame,
                   text="Return to main menu",
                   command=lambda: self.show_frame(self.mainFrame),
                   width=20
                   ).pack()
+        
+
 
 #updating stuff
-
     def set_customIntake(self):
         try:
             amount = int(self.customIntakeEntry.get())
