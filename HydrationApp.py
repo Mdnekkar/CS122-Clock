@@ -50,6 +50,7 @@ class HydrationApp:
 
 
     def show_frame(self, frame):
+        self.updateProgressBar()
         if frame == self.mainFrame: #allow use of button on main screen
             self.customIntakeEntry.unbind("<Return>")
             self.currentIntakeEntry.bind("<Return>", lambda event: self.set_currentIntake())
