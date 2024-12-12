@@ -323,6 +323,7 @@ class HydrationApp:
                     self.humidity_affect = self.dailyIntake * 0.1
                     self.dailyIntake = self.dailyIntake + self.humidity_affect
             messagebox.showinfo("Location Updated", "Your location has been taken into account.")
+            self.updateCurrentIntakeLabel()
 
         except Exception as e:
             messagebox.showerror("Error", f"An unexpected error occured: {e}.")
