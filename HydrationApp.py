@@ -14,9 +14,10 @@ class HydrationApp:
         # Water variables
         self.humidity_affect = 0 # default 0, can be changed later
         self.lifestyle_affect = 0 # default 0, can be changed later
-        self.activity_affect = 0 # defaul 0, can be changed later
+        self.activity_affect = 0 # default 0, can be changed later
         self.dailyIntake = 64 + self.humidity_affect + self.activity_affect + self.lifestyle_affect  # oz
-        
+        self.customIntake = 0
+
 
         self.currentIntake = 0
         self.reminderInterval = 60*60*1000 #default is 1hr in milliseconds
@@ -48,8 +49,11 @@ class HydrationApp:
         self.set_reminder()
 
 
+
     def show_frame(self, frame):
         self.updateProgressBar()
+        self.updateCurrentIntakeLabel()
+        self.updateDailyIntakeLabel()
         if frame == self.mainFrame: #allow use of button on main screen
             self.customIntakeEntry.unbind("<Return>")
             self.currentIntakeEntry.bind("<Return>", lambda event: self.set_currentIntake())
@@ -171,7 +175,7 @@ class HydrationApp:
 
         tk.Button(self.reminderFrame,
                   text="Every 5 seconds (demo)",
-                  width=30,
+                  width=15,
                   command=lambda: self.updateReminderInterval(5)
                   ).pack()
 
@@ -250,6 +254,7 @@ class HydrationApp:
         try:
             amount = int(self.customIntakeEntry.get())
             self.dailyIntake = amount
+            self.customIntake = amount
             self.customIntakeEntry.delete(0, tk.END)
             self.updateDailyIntakeLabel()
             self.updateProgressBar()
@@ -274,22 +279,25 @@ class HydrationApp:
     
     # Updating user's activity levels 
     def set_lifestyle(self, level):
-        self.dailyIntake = self.dailyIntake - self.lifestyle_affect
         activity_levels = {"Sedentary": 0, "Light": 8, "Moderate": 12, "High": 24}
         self.lifestyle_affect = activity_levels.get(level, 0)
-        self.dailyIntake = self.dailyIntake + self.lifestyle_affect
+        self.dailyIntake = self.currentGoal() + self.humidity_affect + self.activity_affect + self.lifestyle_affect
         self.updateDailyIntakeLabel()
         messagebox.showinfo("Lifestyle Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
     # Updating the physcial activity in settings
     def set_physical_activity(self, level):
-        self.dailyIntake = self.dailyIntake - self.activity_affect
         activity_levels = {"Light": 8, "Moderate": 12, "Intense": 16}
         self.activity_affect = activity_levels.get(level, 0)
-        self.dailyIntake = self.dailyIntake + self.activity_affect
+        self.dailyIntake = self.currentGoal() + self.humidity_affect + self.activity_affect + self.lifestyle_affect
         self.updateDailyIntakeLabel()
         messagebox.showinfo("Workout Activity Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
+    def currentGoal(self):
+        if self.customIntake > 0:
+            return self.customIntake
+        else:
+            return 64
 
     def get_location_data(self):
         try:
@@ -319,16 +327,16 @@ class HydrationApp:
                 f_temp = weather_data[1]
 
                 if humidity < 30 or humidity > 60:
-                    self.dailyIntake = self.dailyIntake - self.humidity_affect
                     self.humidity_affect = self.dailyIntake * 0.1
-                    self.dailyIntake = self.dailyIntake + self.humidity_affect
+                    self.dailyIntake = self.currentGoal() + self.activity_affect + self.humidity_affect
             messagebox.showinfo("Location Updated", "Your location has been taken into account.")
-            self.updateCurrentIntakeLabel()
 
         except Exception as e:
             messagebox.showerror("Error", f"An unexpected error occured: {e}.")
 
         
+
+
 #updating labels
     def updateCurrentIntakeLabel(self): # to update current intake label
         self.currentIntakelabel.config(text=f"Current Intake: {self.currentIntake} oz")
