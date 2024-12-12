@@ -36,7 +36,7 @@ def convert_coordinates_to_humidity(lat, lon):
 
     import requests
 
-    url = "https://api.tomorrow.io/v4/weather/realtime?location=toronto&apikey=qkmebBv8ketyz5R6Iomew2Cb07rGJTMu"
+    url = "https://api.tomorrow.io/v4/weather/realtime?location=toronto&apikey=f8t7KrtKNp11rvWLVwQseCzjEevq1WK3 "
 
     headers = {"accept": "application/json"}
 
