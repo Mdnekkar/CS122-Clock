@@ -277,7 +277,7 @@ class HydrationApp:
         self.dailyIntake = self.dailyIntake - self.lifestyle_affect
         activity_levels = {"Sedentary": 0, "Light": 8, "Moderate": 12, "High": 24}
         self.lifestyle_affect = activity_levels.get(level, 0)
-        self.dailyIntake = self.dailyIntake + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.dailyIntake = self.dailyIntake + self.lifestyle_affect
         self.updateDailyIntakeLabel()
         messagebox.showinfo("Lifestyle Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
@@ -286,7 +286,7 @@ class HydrationApp:
         self.dailyIntake = self.dailyIntake - self.activity_affect
         activity_levels = {"Light": 8, "Moderate": 12, "Intense": 16}
         self.activity_affect = activity_levels.get(level, 0)
-        self.dailyIntake = self.dailyIntake + self.humidity_affect + self.activity_affect + self.lifestyle_affect
+        self.dailyIntake = self.dailyIntake + self.activity_affect
         self.updateDailyIntakeLabel()
         messagebox.showinfo("Workout Activity Set", f"Your lifestyle is set to {level}. Daily intake updated!")
 
@@ -321,7 +321,7 @@ class HydrationApp:
                 if humidity < 30 or humidity > 60:
                     self.dailyIntake = self.dailyIntake - self.humidity_affect
                     self.humidity_affect = self.dailyIntake * 0.1
-                    self.dailyIntake = self.dailyIntake + self.activity_affect + self.humidity_affect + self.set_physical_activity
+                    self.dailyIntake = self.dailyIntake + self.humidity_affect
             messagebox.showinfo("Location Updated", "Your location has been taken into account.")
 
         except Exception as e:
